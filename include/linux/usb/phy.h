@@ -176,6 +176,11 @@ struct usb_phy {
 
 	/* reset the PHY clocks */
 	int     (*reset)(struct usb_phy *x);
+
+#ifdef ODM_WT_EDIT
+	/* Jie.Huang@ODM_WT.BSP.Charger.Basic.2596733, 20191203, Add for CDP shutdown charging */
+	int	(*drive_dp_pulse)(struct usb_phy *x, unsigned int pulse_width);
+#endif
 };
 
 /**
@@ -258,6 +263,18 @@ usb_phy_reset(struct usb_phy *x)
 
 	return 0;
 }
+
+#ifdef ODM_WT_EDIT
+/* Jie.Huang@ODM_WT.BSP.Charger.Basic.2596733, 20191203, Add for CDP shutdown charging */
+static inline int
+usb_phy_drive_dp_pulse(struct usb_phy *x, unsigned int pulse_width)
+{
+	if (x && x->drive_dp_pulse)
+		return x->drive_dp_pulse(x, pulse_width);
+
+	return 0;
+}
+#endif
 
 /* for usb host and peripheral controller drivers */
 #if IS_ENABLED(CONFIG_USB_PHY)
