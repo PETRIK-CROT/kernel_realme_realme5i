@@ -217,6 +217,11 @@ source "drivers/mux/Kconfig"
 
 source "drivers/sensors/Kconfig"
 
+#ifdef ODM_WT_EDIT
+# Hui.Wang@ODM_WT.BSP.Kernel.Stability.1941873, 2019/04/20, Add for save bootloader log
+source "drivers/wt_sys/Kconfig"
+#endif
+
 source "drivers/esoc/Kconfig"
 
 endmenu
