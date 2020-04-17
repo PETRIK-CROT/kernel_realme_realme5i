@@ -1055,9 +1055,14 @@ EXPORT_SYMBOL(mipi_dsi_dcs_set_tear_scanline);
 int mipi_dsi_dcs_set_display_brightness(struct mipi_dsi_device *dsi,
 					u16 brightness)
 {
+	#ifndef VENDOR_EDIT
+	//liwei.a@oppo.com, 2019.04.18, first params should be the higher bit of 0x51h
 	u8 payload[2] = { brightness & 0xff, brightness >> 8 };
-	ssize_t err;
+	#else
+	u8 payload[2] = { brightness >> 8, brightness & 0xff };
+	#endif
 
+	ssize_t err;
 	err = mipi_dsi_dcs_write(dsi, MIPI_DCS_SET_DISPLAY_BRIGHTNESS,
 				 payload, sizeof(payload));
 	if (err < 0)
@@ -1066,6 +1071,26 @@ int mipi_dsi_dcs_set_display_brightness(struct mipi_dsi_device *dsi,
 	return 0;
 }
 EXPORT_SYMBOL(mipi_dsi_dcs_set_display_brightness);
+
+#ifdef ODM_WT_EDIT
+//Hongzhu.Su@ODM_WT.MM.Display.Lcd.1941873, Start 2019/04/17, add CABC cmd used for power saving
+int mipi_dsi_dcs_set_display_cabc(struct mipi_dsi_device *dsi,
+									u32 cabc_mode)
+{
+	u8 payload[1];
+	ssize_t err;
+	payload[0] = (u8)cabc_mode;
+	pr_info("func:%s cabc mode:%d\n",__func__,payload[0]);
+	err = mipi_dsi_dcs_write(dsi, MIPI_DCS_WRITE_POWER_SAVE,
+				 payload, sizeof(payload));
+	if (err < 0)
+		return err;
+
+	return 0;
+}
+EXPORT_SYMBOL(mipi_dsi_dcs_set_display_cabc);
+//Hongzhu.Su@ODM_WT.MM.Display.Lcd.1941873, End 2019/04/17, add CABC cmd used for power saving
+#endif /* ODM_WT_EDIT */
 
 /**
  * mipi_dsi_dcs_get_display_brightness() - gets the current brightness value
